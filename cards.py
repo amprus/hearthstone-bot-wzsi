@@ -20,10 +20,13 @@ class Minion(Card):
         super(Minion, self).__init__(name, keywords, cost)
         self.attack = attack
         self.health = health
+        self.can_attack = False
 
     def battle(self, target):
-        self.health -= target.attack
-        target.health -= self.attack
+        if self.can_attack:
+            self.health -= target.attack
+            target.health -= self.attack
+            self.can_attack = False
 
     @classmethod
     def from_dict(cls, dict_def):

@@ -1,6 +1,7 @@
 from deck import DeckInitializer, Hand
 from player import Player
 from random import random
+from cards import Minion
 
 
 class Board:
@@ -32,9 +33,22 @@ class Board:
         self.players[self.active_player].end_turn()
         self.active_player = 1 if self.active_player == 0 else 0
         self.players[self.active_player].start_turn()
+        for card in self.sides[self.active_player]:
+            if isinstance(card, Minion):
+                card.can_attack = True
 
     def use_card(self, index1, index2):
         pass
+
+    def attack(self, index1, index2):
+        other_player = 1 if self.active_player == 0 else 1
+        attacker = self.sides[self.active_player][index1]
+        defender = self.sides[other_player][index2]
+        attacker.battle(defender)
+        if attacker.health <= 0:
+            self.sides[self.active_player].pop(index1)
+        if defender.health <= 0:
+            self.sides[other_player].pop(index2)
 
     def game_loop(self):
         pass
