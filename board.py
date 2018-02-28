@@ -45,10 +45,18 @@ class Board:
 
     def attack(self, index1, index2):
         other_player = 1 if self.active_player == 0 else 0
-        print('{} {}'.format(self.active_player, other_player))
         attacker = self.sides[self.active_player][index1]
         defender = self.sides[other_player][index2]
-        attacker.battle(defender)
+        defender_has_taunt = 'taunt' in defender.keywords
+        other_has_taunt = False
+        for card in self.sides[other_player]:
+            if 'taunt' in card.keywords:
+                other_has_taunt = True
+        
+        if not (other_has_taunt and not defender_has_taunt):
+            attacker.battle(defender)
+        else:
+            print('Somebody else has taunt!')
         if attacker.health <= 0:
             self.sides[self.active_player].pop(index1)
         if defender.health <= 0:

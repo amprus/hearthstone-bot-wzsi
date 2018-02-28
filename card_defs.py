@@ -46,6 +46,14 @@ card_defs = (
         'cost': 3,
         'attack': 3,
         'health': 1
+    }, 
+    {
+        'type': 'minion',
+        'name': 'Ironfur Grizzly',
+        'keywords': ['taunt'],
+        'cost': 3,
+        'attack': 3,
+        'health': 3
     }
 )
 

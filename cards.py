@@ -22,8 +22,11 @@ class Minion(Card):
         self.health = health
         self.can_attack = False
         self.protection = False
+        self.taunt = False
         if 'divine_shield' in keywords:
             self.protection = True
+        if 'taunt' in keywords:
+            self.taunt = True
 
     def battle(self, target):
         if self.can_attack:
@@ -53,6 +56,10 @@ class Minion(Card):
         format_str = '({}) {}, {} [{}/{}]'.format(self.cost, self.name, self.type, self.attack, self.health)
         if self.protection:
             format_str += ' [DIVINE SHIELD]'
+        if self.taunt:
+            format_str += ' [TAUNT]'
+        if not self.can_attack:
+            format_str += ' ZZzzZZ...'
         return format_str
 
 class Spell(Card):
