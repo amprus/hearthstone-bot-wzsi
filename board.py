@@ -16,8 +16,8 @@ class Board:
         p1_starts = self._player1_starts()
         self.active_player = 0 if p1_starts else 1 
         self.players = [
-            Player(id=1, hand=Hand(self.deck1), hero=initializer.create_hero('jaina'), starts=p1_starts),
-            Player(id=2, hand=Hand(self.deck2), hero=initializer.create_hero('jaina'), starts=not p1_starts)
+            Player(id=1, hand=Hand(self.deck1), starts=p1_starts),
+            Player(id=2, hand=Hand(self.deck2), starts=not p1_starts)
         ]
         self.sides = [[initializer.create_hero('jaina')], [initializer.create_hero('jaina')]]
 
@@ -34,6 +34,8 @@ class Board:
         self.players[self.active_player].end_turn()
         self.active_player = 1 if self.active_player == 0 else 0
         self.players[self.active_player].start_turn()
+        fatigue = self.players[self.active_player].fatigue
+        self.sides[self.active_player][0].take_dmg(fatigue)
         for card in self.sides[self.active_player]:
             if isinstance(card, Minion):
                 card.can_attack = True
@@ -42,7 +44,8 @@ class Board:
         pass
 
     def attack(self, index1, index2):
-        other_player = 1 if self.active_player == 0 else 1
+        other_player = 1 if self.active_player == 0 else 0
+        print('{} {}'.format(self.active_player, other_player))
         attacker = self.sides[self.active_player][index1]
         defender = self.sides[other_player][index2]
         attacker.battle(defender)
@@ -58,7 +61,7 @@ class Board:
 
     def game_over(self, active):
         print('Player #{} won!'.format(active+1))
-        sys.exit(0)
+        sys.exit(active)
 
     def __str__(self):
         board_str = ''

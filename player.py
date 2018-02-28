@@ -1,8 +1,7 @@
 class Player:
-    def __init__(self, id, hand, hero, starts=False):
+    def __init__(self, id, hand, starts=False):
         self.id = id
         self.hand = hand
-        self.hero = hero
         self.has_turn = starts
         self.turn = 1 if starts else 0 
         for i in range(3):
@@ -28,7 +27,6 @@ class Player:
             self.hand.draw()
         except:
             self.fatigue += 1
-            self.hero.health -= self.fatigue
 
     def play_card(self, index):
         if self.mana >= self.hand.cards[index].cost:
@@ -38,12 +36,9 @@ class Player:
         else:
             return None
 
-    def has_lost(self):
-        return self.hero.health <= 0
-
     def __str__(self):
         player_str = 'PLAYER #{} {}:\n'.format(self.id, '(ACTIVE)' if self.has_turn else '')
-        player_str += 'HEALTH: {} MANA: {}\n'.format(self.hero.health, self.mana)
+        player_str += 'MANA: {}\n'.format(self.mana)
         player_str += str(self.hand)
         return player_str
 

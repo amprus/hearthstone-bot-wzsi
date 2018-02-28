@@ -21,12 +21,23 @@ class Minion(Card):
         self.attack = attack
         self.health = health
         self.can_attack = False
+        self.protection = False
+        if 'divine_shield' in keywords:
+            self.protection = True
 
     def battle(self, target):
         if self.can_attack:
-            self.health -= target.attack
-            target.health -= self.attack
+            self.take_dmg(target.attack)
+            target.take_dmg(self.attack)
             self.can_attack = False
+
+    def take_dmg(self, dmg):
+        if self.protection and dmg > 0:
+            print(self, self.protection)
+            self.protection = False
+            return
+        self.health -= dmg
+
 
     @classmethod
     def from_dict(cls, dict_def):
@@ -39,8 +50,10 @@ class Minion(Card):
         )
 
     def __str__(self):
-        return '({}) {}, {} [{}/{}]'.format(self.cost, self.name, self.type, self.attack, self.health)
-
+        format_str = '({}) {}, {} [{}/{}]'.format(self.cost, self.name, self.type, self.attack, self.health)
+        if self.protection:
+            format_str += ' [DIVINE SHIELD]'
+        return format_str
 
 class Spell(Card):
     type = 'spell'
