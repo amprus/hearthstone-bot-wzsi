@@ -1,13 +1,13 @@
 from deck import DeckInitializer, Hand
 from player import Player
 from random import random
-from cards import Minion
+from cards import Minion, Hero
+import sys
 
 
 class Board:
     def __init__(self):
         self._initialize_game()
-        self.sides = [[], []]
 
     def _initialize_game(self):
         initializer = DeckInitializer()
@@ -19,6 +19,7 @@ class Board:
             Player(id=1, hand=Hand(self.deck1), hero=initializer.create_hero('jaina'), starts=p1_starts),
             Player(id=2, hand=Hand(self.deck2), hero=initializer.create_hero('jaina'), starts=not p1_starts)
         ]
+        self.sides = [[initializer.create_hero('jaina')], [initializer.create_hero('jaina')]]
 
     def _player1_starts(self):
         return random() < 0.5
@@ -48,10 +49,16 @@ class Board:
         if attacker.health <= 0:
             self.sides[self.active_player].pop(index1)
         if defender.health <= 0:
+            if isinstance(defender, Hero):
+                self.game_over(self.active_player)
             self.sides[other_player].pop(index2)
 
     def game_loop(self):
         pass
+
+    def game_over(self, active):
+        print('Player #{} won!'.format(active+1))
+        sys.exit(0)
 
     def __str__(self):
         board_str = ''

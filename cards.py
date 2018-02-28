@@ -65,11 +65,11 @@ class Spell(Card):
         return '({}) {}, {} [dmg: {}]'.format(self.cost, self.name, self.type, self.damage)
 
 
-class Hero(Card):
+class Hero(Minion):
     type = 'hero'
 
     def __init__(self, name, health):
-        super(Hero, self).__init__(name, [], 0)
+        super(Hero, self).__init__(name=name, keywords=[], cost=0, attack=0, health=health)
         self.health = health
 
     @classmethod
@@ -79,8 +79,11 @@ class Hero(Card):
             health=hero_def['health']
         )
 
+    def battle(self, target):
+        pass
+
     def __str__(self):
-        return '({}) {} {}'.format(self.health, self.name.upper())
+        return '({}) {}, {}'.format(self.health, self.name.upper(), self.type)
 
 
 class Coin(Card):
