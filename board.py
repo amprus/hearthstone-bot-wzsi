@@ -2,22 +2,28 @@ from deck import DeckInitializer, Hand
 from player import Player
 from random import random
 from cards import Minion, Hero
+from actions import ActionFactory
 import sys
 
 
 class Board:
     def __init__(self):
-        self._initialize_game()
+        self.actions = ActionFactory(self)
+        self.deck1 = []
+        self.deck2 = []
+        self.players = []
+        self.sides = [[], []]
+        self.active_player = 0
 
-    def _initialize_game(self):
+    def initialize_game(self):
         initializer = DeckInitializer()
         self.deck1 = initializer.make_std_deck()
         self.deck2 = initializer.make_std_deck()
         p1_starts = self._player1_starts()
         self.active_player = 0 if p1_starts else 1 
         self.players = [
-            Player(id=1, hand=Hand(self.deck1), starts=p1_starts),
-            Player(id=2, hand=Hand(self.deck2), starts=not p1_starts)
+            Player(id=1, deck=self.deck1, hand=Hand(self.deck1), starts=p1_starts),
+            Player(id=2, deck=self.deck2, hand=Hand(self.deck2), starts=not p1_starts)
         ]
         self.sides = [[initializer.create_hero('jaina')], [initializer.create_hero('jaina')]]
 
@@ -25,44 +31,40 @@ class Board:
         return random() < 0.5
 
     def play_card(self, index):
-        if len(self.sides[self.active_player]) < 7:
-            card = self.players[self.active_player].play_card(index)
-            if card:
-                self.sides[self.active_player].append(card)
+        self.execute_action(self.actions.play_minion(index))
 
     def end_turn(self):
-        self.players[self.active_player].end_turn()
-        self.active_player = 1 if self.active_player == 0 else 0
-        self.players[self.active_player].start_turn()
-        fatigue = self.players[self.active_player].fatigue
-        self.sides[self.active_player][0].take_dmg(fatigue)
-        for card in self.sides[self.active_player]:
-            if isinstance(card, Minion):
-                card.can_attack = True
+        self.execute_action(self.actions.end_turn())
 
-    def use_card(self, index1, index2):
-        pass
+    def active_draw_card(self, card_idx):
+        self.execute_action(self.actions.draw(card_idx))
 
-    def attack(self, index1, index2):
-        other_player = 1 if self.active_player == 0 else 0
-        attacker = self.sides[self.active_player][index1]
-        defender = self.sides[other_player][index2]
-        defender_has_taunt = 'taunt' in defender.keywords
-        other_has_taunt = False
-        for card in self.sides[other_player]:
-            if 'taunt' in card.keywords:
-                other_has_taunt = True
-        
-        if not (other_has_taunt and not defender_has_taunt):
-            attacker.battle(defender)
-        else:
-            print('Somebody else has taunt!')
-        if attacker.health <= 0:
-            self.sides[self.active_player].pop(index1)
-        if defender.health <= 0:
-            if isinstance(defender, Hero):
-                self.game_over(self.active_player)
-            self.sides[other_player].pop(index2)
+    def attack(self, atk_idx, def_idx):
+        self.execute_action(self.actions.attack(atk_idx, def_idx))
+
+    def execute_action(self, action):
+        action.execute()
+
+    def change_active_player(self):
+        self.active_player = self.get_other_idx()
+
+    def get_active_idx(self):
+        return self.active_player
+
+    def get_other_idx(self):
+        return 1 if self.active_player == 0 else 0
+
+    def get_active_side(self):
+        return self.sides[self.get_active_idx()]
+
+    def get_other_side(self):
+        return self.sides[self.get_other_idx()]
+
+    def get_active_player(self):
+        return self.players[self.get_active_idx()]
+
+    def get_other_player(self):
+        return self.players[self.get_other_idx()]
 
     def game_loop(self):
         pass

@@ -20,8 +20,8 @@ class Deck:
   def shuffle(self):
     np.random.shuffle(self.cards)
 
-  def pop_card(self):
-    return self.cards.pop()
+  def pop_card(self, index):
+    return self.cards.pop(index)
 
   def has_cards(self):
     return len(self.cards) > 0
@@ -32,8 +32,8 @@ class Hand:
         self.deck = deck
         self.cards = []
 
-    def draw(self):
-        card = self.deck.pop_card()
+    def draw(self, index=0):
+        card = self.deck.pop_card(index)
         if len(self.cards) < 10:
             self.cards.append(card)
 

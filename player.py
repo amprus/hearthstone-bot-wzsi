@@ -1,8 +1,9 @@
 class Player:
-    def __init__(self, id, hand, starts=False):
+    def __init__(self, id, deck, hand, starts=False):
         self.id = id
         self.hand = hand
         self.has_turn = starts
+        self.deck = deck
         self.turn = 1 if starts else 0 
         for i in range(3):
             self.draw_card()
@@ -22,10 +23,10 @@ class Player:
     def end_turn(self):
         self.has_turn = False
     
-    def draw_card(self):
-        try:
-            self.hand.draw()
-        except:
+    def draw_card(self, index=0):
+        if self.deck.has_cards():
+            self.hand.draw(index)
+        else:
             self.fatigue += 1
 
     def play_card(self, index):

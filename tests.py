@@ -3,5 +3,9 @@ from deck import Deck
 from board import Board
 
 
-board = Board()
-print(board)
+b = Board()
+b.initialize_game()
+print(b)
+
+def p():
+    print(b)

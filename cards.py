@@ -36,11 +36,12 @@ class Minion(Card):
 
     def take_dmg(self, dmg):
         if self.protection and dmg > 0:
-            print(self, self.protection)
             self.protection = False
             return
         self.health -= dmg
 
+    def is_dead(self):
+        return self.health <= 0
 
     @classmethod
     def from_dict(cls, dict_def):
