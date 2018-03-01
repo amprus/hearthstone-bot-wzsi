@@ -50,7 +50,7 @@ class Minion(Card):
             keywords=dict_def['keywords'],
             cost=dict_def['cost'],
             attack=dict_def['attack'],
-            health=dict_def['health']    
+            health=dict_def['health']
         )
 
     def __str__(self):
@@ -63,15 +63,13 @@ class Minion(Card):
             format_str += ' ZZzzZZ...'
         return format_str
 
+
 class Spell(Card):
     type = 'spell'
 
     def __init__(self, name, keywords, cost, damage):
         super(Spell, self).__init__(name, keywords, cost)
         self.damage = damage
-
-    def deal_damage(self, target):
-        target.health -= self.damage
 
     @classmethod
     def from_dict(cls, dict_def):
@@ -82,8 +80,11 @@ class Spell(Card):
             damage=dict_def['damage']
         )
 
+    def attacks_what(self):
+        return 'hero' if 'attack_hero' in self.keywords else 'all'
+
     def __str__(self):
-        return '({}) {}, {} [dmg: {}]'.format(self.cost, self.name, self.type, self.damage)
+        return '({}) {}, {} [dmg: {}] [attacks: {}]'.format(self.cost, self.name, self.type, self.damage, self.attacks_what())
 
 
 class Hero(Minion):

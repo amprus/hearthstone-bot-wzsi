@@ -19,7 +19,7 @@ class Player:
         self.turn += 1
         self.mana = self.turn if self.turn <= 10 else 10
         self.draw_card()
-        
+
     def end_turn(self):
         self.has_turn = False
     
@@ -30,10 +30,11 @@ class Player:
             self.fatigue += 1
 
     def play_card(self, index):
-        if self.mana >= self.hand.cards[index].cost:
-            card = self.hand.play_card(index)
-            self.mana -= card.cost
-            return card
+        if self.hand.cards[index].type == 'minion':
+            if self.mana >= self.hand.cards[index].cost:
+                card = self.hand.play_card(index)
+                self.mana -= card.cost
+                return card
         else:
             return None
 
@@ -43,4 +44,3 @@ class Player:
         player_str += str(self.hand)
         return player_str
 
-    

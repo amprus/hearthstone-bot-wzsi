@@ -30,8 +30,20 @@ class Board:
     def _player1_starts(self):
         return random() < 0.5
 
-    def play_card(self, index):
+    def play_minion(self, index):
         self.execute_action(self.actions.play_minion(index))
+
+    def play_spell(self, index1, index2):
+        defender_card = self.sides[1 if self.active_player == 0 else 0][index2]
+        attacker_spell = self.players[self.active_player].hand.cards[index1]
+        if self.players[self.active_player].mana >= attacker_spell.cost:
+            self.players[self.active_player].mana -= attacker_spell.cost
+            SpellThrower.throw_spell(attacker_spell, defender_card)
+            self.players[self.active_player].hand.cards.pop(index1)
+            if defender_card.health <= 0:
+                if isinstance(defender_card, Hero):
+                    self.game_over(self.active_player)
+                self.sides[1 if self.active_player == 0 else 0].pop(index2)
 
     def end_turn(self):
         self.execute_action(self.actions.end_turn())
@@ -85,3 +97,11 @@ class Board:
             for card in side:
                 board_str += '{}\n'.format(card)
         return board_str
+
+
+class SpellThrower:
+
+    @staticmethod
+    def throw_spell(spell, affect_on):
+        if spell.type == 'spell':
+            affect_on.health -= spell.damage

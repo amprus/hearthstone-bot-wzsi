@@ -46,7 +46,7 @@ card_defs = (
         'cost': 3,
         'attack': 3,
         'health': 1
-    }, 
+    },
     {
         'type': 'minion',
         'name': 'Ironfur Grizzly',
@@ -63,3 +63,27 @@ hero_defs = {
         'health': 20
     }
 }
+
+spells_defs = (
+    {
+        'type': 'spell',
+        'name': 'Flame Lance',
+        'cost': 5,
+        'keywords': [],
+        'damage': 8
+    },
+    {
+        'type': 'spell',
+        'name': 'Arcane Shot',
+        'cost': 1,
+        'keywords': [],
+        'damage': 2
+    },
+    {
+        'type': 'spell',
+        'name': 'Sinister Strike',
+        'cost': 1,
+        'keywords': [],
+        'damage': 3
+    },
+)

@@ -1,30 +1,27 @@
 import numpy as np
 
 from cards import Hero, Minion, Spell, Coin
-from card_defs import card_defs, hero_defs
+from card_defs import *
+
 
 class Deck:
-  cards = []
+    cards = []
 
-  #def __init__(self):        #dummy one
-  #  for i in range(0, 20):
-  #    self.cards.append(Card(i))
+    def __init__(self, cards):
+        self.cards = cards
 
-  def __init__(self, cards):
-    self.cards = cards
+    def show_deck(self):
+        for card in self.cards:
+            card.show_card()
 
-  def show_deck(self):
-    for card in self.cards:
-        card.show_card()
+    def shuffle(self):
+        np.random.shuffle(self.cards)
 
-  def shuffle(self):
-    np.random.shuffle(self.cards)
+    def pop_card(self, index):
+        return self.cards.pop(index)
 
-  def pop_card(self, index):
-    return self.cards.pop(index)
-
-  def has_cards(self):
-    return len(self.cards) > 0
+    def has_cards(self):
+        return len(self.cards) > 0
 
 
 class Hand:
@@ -52,7 +49,11 @@ class Hand:
 
 class DeckInitializer:
     def make_std_deck(self):
-        cards = [self._make_card_from_def(cdef) for cdef in card_defs] + [self._make_card_from_def(cdef) for cdef in card_defs]
+        cards = \
+            [self._make_card_from_def(cdef) for cdef in card_defs] + \
+            [self._make_card_from_def(cdef) for cdef in card_defs] + \
+            [self._make_card_from_def(cdef) for cdef in spells_defs] + \
+            [self._make_card_from_def(cdef) for cdef in spells_defs]
         deck = Deck(cards)
         deck.shuffle()
         return deck
