@@ -33,17 +33,8 @@ class Board:
     def play_minion(self, index):
         self.execute_action(self.actions.play_minion(index))
 
-    def play_spell(self, index1, index2):
-        defender_card = self.sides[1 if self.active_player == 0 else 0][index2]
-        attacker_spell = self.players[self.active_player].hand.cards[index1]
-        if self.players[self.active_player].mana >= attacker_spell.cost:
-            self.players[self.active_player].mana -= attacker_spell.cost
-            SpellThrower.throw_spell(attacker_spell, defender_card)
-            self.players[self.active_player].hand.cards.pop(index1)
-            if defender_card.health <= 0:
-                if isinstance(defender_card, Hero):
-                    self.game_over(self.active_player)
-                self.sides[1 if self.active_player == 0 else 0].pop(index2)
+    def cast_spell(self, card_idx, target_idx):
+        self.execute_action(self.actions.cast_spell(card_idx, target_idx))
 
     def end_turn(self):
         self.execute_action(self.actions.end_turn())
@@ -59,6 +50,12 @@ class Board:
 
     def change_active_player(self):
         self.active_player = self.get_other_idx()
+
+    def get_active_hand(self):
+        return self.get_active_player().hand
+
+    def get_other_hand(self):
+        return self.get_other_player().hand
 
     def get_active_idx(self):
         return self.active_player
@@ -97,11 +94,3 @@ class Board:
             for card in side:
                 board_str += '{}\n'.format(card)
         return board_str
-
-
-class SpellThrower:
-
-    @staticmethod
-    def throw_spell(spell, affect_on):
-        if spell.type == 'spell':
-            affect_on.health -= spell.damage

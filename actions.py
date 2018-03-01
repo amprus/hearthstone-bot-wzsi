@@ -9,6 +9,7 @@ class Action:
     def execute(self):
         raise NotImplementedError()
 
+
 class DrawCard(Action):
     def __init__(self, board, card_idx):
         super(DrawCard, self).__init__(board)
@@ -81,6 +82,28 @@ class PlayMinion(Action):
                 self.board.get_active_side().append(card)
 
 
+class CastSpell(Action):
+    def __init__(self, board, card_idx, target_idx):
+        super(CastSpell, self).__init__(board)
+        self.card_idx = card_idx
+        self.target_idx = target_idx
+
+    def execute(self):
+        other_side = self.board.get_other_side()
+        target = safe_get(other_side, self.target_idx)
+        if not target:
+            return
+        active_player = self.board.get_active_player()
+        if not isinstance(active_player.hand.cards[self.card_idx], Spell):
+            return
+        spell = active_player.play_card(self.card_idx)
+        spell.deal_damage(target)
+        if target.is_dead():
+            if isinstance(defender_card, Hero):
+                self.board.game_over(self.board.get_active_idx())
+            other_side.pop(self.target_idx)
+
+
 class ActionFactory:
     def __init__(self, board):
         self.board = board
@@ -96,3 +119,6 @@ class ActionFactory:
 
     def play_minion(self, card_idx):
         return PlayMinion(self.board, card_idx)
+
+    def cast_spell(self, card_idx, target_idx):
+        return CastSpell(self.board, card_idx, target_idx)

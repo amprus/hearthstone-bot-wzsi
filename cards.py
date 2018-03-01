@@ -80,6 +80,9 @@ class Spell(Card):
             damage=dict_def['damage']
         )
 
+    def deal_damage(self, target):
+        target.take_dmg(self.damage)
+
     def attacks_what(self):
         return 'hero' if 'attack_hero' in self.keywords else 'all'
 

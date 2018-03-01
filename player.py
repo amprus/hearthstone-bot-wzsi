@@ -29,12 +29,14 @@ class Player:
         else:
             self.fatigue += 1
 
+    def has_mana(self, mana_to_spend):
+        return mana_to_spend <= self.mana
+
     def play_card(self, index):
-        if self.hand.cards[index].type == 'minion':
-            if self.mana >= self.hand.cards[index].cost:
-                card = self.hand.play_card(index)
-                self.mana -= card.cost
-                return card
+        if self.mana >= self.hand.cards[index].cost:
+            card = self.hand.play_card(index)
+            self.mana -= card.cost
+            return card
         else:
             return None
 
