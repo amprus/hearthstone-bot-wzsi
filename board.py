@@ -41,7 +41,16 @@ class Board:
                 card.can_attack = True
 
     def use_card(self, index1, index2):
-        pass
+        defender_card = self.sides[1 if self.active_player == 0 else 0][index2]
+        attacker_spell = self.players[self.active_player].hand.cards[index1]
+        if self.players[self.active_player].mana >= attacker_spell.cost:
+            self.players[self.active_player].mana -= attacker_spell.cost
+            SpellThrower.throw_spell(attacker_spell, defender_card)
+            self.players[self.active_player].hand.cards.pop(index1)
+            if defender_card.health <= 0:
+                if isinstance(defender_card, Hero):
+                    self.game_over(self.active_player)
+                self.sides[1 if self.active_player == 0 else 0].pop(index2)
 
     def attack(self, index1, index2):
         other_player = 1 if self.active_player == 0 else 0
@@ -83,3 +92,11 @@ class Board:
             for card in side:
                 board_str += '{}\n'.format(card)
         return board_str
+
+
+class SpellThrower:
+
+    @staticmethod
+    def throw_spell(spell, affect_on):
+        if spell.type == 'spell':
+            affect_on.health -= spell.damage
