@@ -99,7 +99,7 @@ class CastSpell(Action):
         spell = active_player.play_card(self.card_idx)
         spell.deal_damage(target)
         if target.is_dead():
-            if isinstance(defender_card, Hero):
+            if isinstance(target, Hero):
                 self.board.game_over(self.board.get_active_idx())
             other_side.pop(self.target_idx)
 

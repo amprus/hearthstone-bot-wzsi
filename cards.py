@@ -6,9 +6,6 @@ class Card:
         self.keywords = keywords
         self.cost = cost
 
-    def showCard(self):
-        print(str(self))
-
     def __str__(self):
         return '({}) {}, {}'.format(self.cost, self.name, self.type)
 
@@ -43,6 +40,9 @@ class Minion(Card):
     def is_dead(self):
         return self.health <= 0
 
+    def has_taunt(self):
+        return self.taunt
+
     @classmethod
     def from_dict(cls, dict_def):
         return cls(
@@ -69,7 +69,7 @@ class Spell(Card):
 
     def __init__(self, name, keywords, cost, damage):
         super(Spell, self).__init__(name, keywords, cost)
-        self.damage = damage
+        self.attack = damage
 
     @classmethod
     def from_dict(cls, dict_def):
@@ -81,13 +81,10 @@ class Spell(Card):
         )
 
     def deal_damage(self, target):
-        target.take_dmg(self.damage)
-
-    def attacks_what(self):
-        return 'hero' if 'attack_hero' in self.keywords else 'all'
+        target.take_dmg(self.attack)
 
     def __str__(self):
-        return '({}) {}, {} [dmg: {}] [attacks: {}]'.format(self.cost, self.name, self.type, self.damage, self.attacks_what())
+        return '({}) {}, {} [dmg: {}]'.format(self.cost, self.name, self.type, self.attack)
 
 
 class Hero(Minion):
@@ -96,6 +93,7 @@ class Hero(Minion):
     def __init__(self, name, health):
         super(Hero, self).__init__(name=name, keywords=[], cost=0, attack=0, health=health)
         self.health = health
+        self.can_attack = False
 
     @classmethod
     def from_dict(cls, hero_def):

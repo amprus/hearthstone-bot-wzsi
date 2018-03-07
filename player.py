@@ -10,7 +10,7 @@ class Player:
         if starts:
             self.mana = 1
         else:
-            self.hand.add_coin()
+            #self.hand.add_coin()
             self.mana = 0
         self.fatigue = 0
 
