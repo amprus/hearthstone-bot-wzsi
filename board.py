@@ -7,13 +7,14 @@ import sys
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, on_game_over=None):
         self.actions = ActionFactory(self)
         self.deck1 = []
         self.deck2 = []
         self.players = []
         self.sides = [[], []]
         self.active_player = 0
+        self.on_game_over = on_game_over
 
     def initialize_game(self):
         initializer = DeckInitializer()
@@ -57,6 +58,12 @@ class Board:
     def get_other_hand(self):
         return self.get_other_player().hand
 
+    def get_active_deck(self):
+        return self.get_active_player().deck
+
+    def get_other_deck(self):
+        return self.get_other_player().deck
+
     def get_active_idx(self):
         return self.active_player
 
@@ -80,7 +87,10 @@ class Board:
 
     def game_over(self, active):
         print('Player #{} won!'.format(active+1))
-        sys.exit(active)
+        if not self.on_game_over:
+            sys.exit(active)
+        else:
+            self.on_game_over(active+1)
 
     def __str__(self):
         board_str = ''
