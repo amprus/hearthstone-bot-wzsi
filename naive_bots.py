@@ -16,11 +16,11 @@ class NaiveBot:
     def make_move(self, board):
         self.init_move(board)
         self.choose_cards_to_play()
-        self.play_cards(board)
         self.define_possible_moves()
         self.choose_targets(board.sides[0] if board.active_player == 1 else board.sides[1])
         self.create_battles()
         self.fight_battles(board)
+        self.play_cards(board)
         self.end_turn(board)
 
     def init_move(self, board):
@@ -51,19 +51,23 @@ class NaiveBot:
                 board.play_minion(index)
 
     def fight_battles(self, board):
-        for attacking_cards, target_index in self.battles:
+        for battle_index, battle in enumerate(self.battles):
+            attacking_cards, target_index = battle[0], battle[1]
             attacking_cards.sort(key=lambda x: x[1], reverse=True)
             for i in range(len(attacking_cards)):
                 card, hand_index = attacking_cards[i]
                 if isinstance(card, Spell):
-                    board.cast_spell(hand_index, target_index)
+                    board.cast_spell(hand_index, target_index, safe=True)
+                    self.repair_hand_indexes(hand_index)
+                    self.repair_other_battles(hand_index, battle_index)
                 elif isinstance(card, Minion):
-                    board.attack(hand_index, target_index)
+                    board.attack(hand_index, target_index, safe=True)
 
-    def end_turn(self, board):
+    def end_turn(self, board, silent=True):
         self.__init__()
-        board.end_turn()
-        print(board)
+        board.end_turn(safe=True)
+        if not silent:
+            print(board)
 
     def choose_taunts(self, opponent_side):
         for position, card in enumerate(opponent_side):
@@ -76,18 +80,37 @@ class NaiveBot:
     def card_rating(self, card):
         raise NotImplementedError
 
+    def repair_hand_indexes(self, hand_index):
+        for index, card in enumerate(self.possible_cards):
+            if card[1] > hand_index:
+                self.possible_cards[index] = (card[0], card[1] - 1)
+
+    def repair_other_battles(self, hand_index, battle_index):
+        for index, battle in enumerate(self.battles):
+            if index > battle_index:
+                cards = battle[0]
+                for idx, card in enumerate(cards):
+                    if isinstance(card[0], Spell) and card[1] > hand_index:
+                        cards[idx] = (card[0], card[1] - 1)
+                        self.battles[index] = (cards, battle[1])
+
 
 class AggressiveBot(NaiveBot):
 
     def choose_targets(self, opponent_side):
         self.choose_taunts(opponent_side)
         for position, card in enumerate(opponent_side):
-            if card.attack >= 5:
+            if card.attack >= 4 or card.health > 4:
                 self.targets.append((card, position))
         self.targets.append((opponent_side[0], 0))
 
     def card_rating(self, card):
-        return card.attack
+        rating = (2*card.attack)
+        if isinstance(card, Minion):
+            rating += (0.75 * card.health)
+            if card.has_taunt():
+                rating += 2
+        return rating
 
 
 class PassiveBot(NaiveBot):
@@ -103,4 +126,7 @@ class PassiveBot(NaiveBot):
         if isinstance(card, Spell):
             return card.attack * (3 / 5)
         elif isinstance(card, Minion):
-            return card.health + (card.attack * (3 / 5))
+            rating = card.health + (card.attack * (3 / 5))
+            if card.has_taunt():
+                rating += 2
+            return rating

@@ -14,6 +14,7 @@ class Board:
         self.players = []
         self.sides = [[], []]
         self.active_player = 0
+        self.over = False
 
     def initialize_game(self):
         initializer = DeckInitializer()
@@ -33,17 +34,17 @@ class Board:
     def play_minion(self, index):
         self.execute_action(self.actions.play_minion(index))
 
-    def cast_spell(self, card_idx, target_idx):
-        self.execute_action(self.actions.cast_spell(card_idx, target_idx))
+    def cast_spell(self, card_idx, target_idx, safe=False):
+        self.execute_action(self.actions.cast_spell(card_idx, target_idx, safe))
 
-    def end_turn(self):
-        self.execute_action(self.actions.end_turn())
+    def end_turn(self, safe=False):
+        self.execute_action(self.actions.end_turn(safe))
 
     def active_draw_card(self, card_idx):
         self.execute_action(self.actions.draw(card_idx))
 
-    def attack(self, atk_idx, def_idx):
-        self.execute_action(self.actions.attack(atk_idx, def_idx))
+    def attack(self, atk_idx, def_idx, safe=False):
+        self.execute_action(self.actions.attack(atk_idx, def_idx, safe))
 
     def execute_action(self, action):
         action.execute()
@@ -80,7 +81,7 @@ class Board:
 
     def game_over(self, active):
         print('Player #{} won!'.format(active+1))
-        sys.exit(active)
+        self.over = True
 
     def __str__(self):
         board_str = ''

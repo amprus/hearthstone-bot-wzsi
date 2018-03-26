@@ -21,10 +21,13 @@ class DrawCard(Action):
 
 
 class EndTurn(Action):
-    def __init__(self, board):
+    def __init__(self, board, safe):
         super(EndTurn, self).__init__(board)
+        self.safe = safe
 
     def execute(self):
+        if self.safe:
+            self.execute_safe()
         self.board.get_active_player().end_turn()
         self.board.change_active_player()
         self.board.get_active_player().start_turn()
@@ -34,12 +37,20 @@ class EndTurn(Action):
             if isinstance(card, Minion):
                 card.can_attack = True
 
+    def execute_safe(self):
+        for side in self.board.sides:
+            for card_idx in range(len(side) - 1, 0, -1):
+                if isinstance(side[card_idx], Minion):
+                    if side[card_idx].is_dead():
+                        side.pop(card_idx)
+
 
 class Attack(Action):
-    def __init__(self, board, atk_idx, def_idx):
+    def __init__(self, board, atk_idx, def_idx, safe):
         super(Attack, self).__init__(board)
         self.atk_idx = atk_idx
         self.def_idx = def_idx
+        self.safe = safe
     
     def execute(self):
         active_side = self.board.get_active_side()
@@ -52,12 +63,13 @@ class Attack(Action):
         if taunts and not self.def_idx in taunts:
             return
         attacker.battle(defender)
-        if attacker.is_dead():
+        if attacker.is_dead() and not self.safe:
             active_side.pop(self.atk_idx)
         if defender.is_dead():
             if isinstance(defender, Hero):
                 self.board.game_over(self.board.get_active_idx())
-            other_side.pop(self.def_idx)
+            if not self.safe:
+                other_side.pop(self.def_idx)
 
     def get_opponent_taunts(self):
         other_side = self.board.get_other_side()
@@ -83,10 +95,11 @@ class PlayMinion(Action):
 
 
 class CastSpell(Action):
-    def __init__(self, board, card_idx, target_idx):
+    def __init__(self, board, card_idx, target_idx, safe):
         super(CastSpell, self).__init__(board)
         self.card_idx = card_idx
         self.target_idx = target_idx
+        self.safe = safe
 
     def execute(self):
         other_side = self.board.get_other_side()
@@ -101,24 +114,25 @@ class CastSpell(Action):
         if target.is_dead():
             if isinstance(target, Hero):
                 self.board.game_over(self.board.get_active_idx())
-            other_side.pop(self.target_idx)
+            if not self.safe:
+                other_side.pop(self.target_idx)
 
 
 class ActionFactory:
     def __init__(self, board):
         self.board = board
     
-    def attack(self, atk_idx, def_idx):
-        return Attack(self.board, atk_idx, def_idx)
+    def attack(self, atk_idx, def_idx, safe=False):
+        return Attack(self.board, atk_idx, def_idx, safe)
 
     def draw(self, idx):
         return DrawCard(self.board, idx)
 
-    def end_turn(self):
-        return EndTurn(self.board)
+    def end_turn(self, safe=False):
+        return EndTurn(self.board, safe)
 
     def play_minion(self, card_idx):
         return PlayMinion(self.board, card_idx)
 
-    def cast_spell(self, card_idx, target_idx):
-        return CastSpell(self.board, card_idx, target_idx)
+    def cast_spell(self, card_idx, target_idx, safe=False):
+        return CastSpell(self.board, card_idx, target_idx, safe)
