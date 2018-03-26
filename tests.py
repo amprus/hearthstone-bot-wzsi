@@ -1,29 +1,39 @@
 from board import Board
-from naive_bots import *
+from naive_bots import AggressiveBot, PassiveBot
+from mcts.board_analyzer import Analyzer
+from mcts.tree import TreeManager
 
-b = None
+from copy import deepcopy
+
+def p():
+    print(b)
+
+p()
+analyzer = Analyzer(b)
+
+# Show available actions for this moment
+def pa():
+    actions = analyzer.generate_actions()
+    for action in actions:
+        print(action)
 
 
-def agrr_make_move(ag, bb):
-    ag.make_move(bb)
+# Show grade for this state of board
+def ps():
+    score = analyzer.grade_board()
+    print(score)
 
 
-def pass_make_move(ps, bb):
-    ps.make_move(bb)
+# Use this method to show decision tree in-game
+def tree():
+    tm = TreeManager(b)
+    tm.make_children_for_current()
+    print(tm)    
 
-
-def play(r, ag, ps, bb):
-    for i in range(r):
-        agrr_make_move(ag, bb)
-        pass_make_move(ps, bb)
-
-
-def play_times(r, bc):
-    for i in range(r):
-        bc = Board()
-        bc.initialize_game()
-        agg = AggressiveBot()
-        pss = PassiveBot()
-        print("Aggressive player: {}\nPassive Player: {}".format(bc.active_player + 1, 1 if bc.active_player == 1 else 2))
-        while not bc.over:
-            play(1, agg, pss, bc)
+# Demo with expanding left-most part of the tree
+def tree_demo():
+    tm = TreeManager(b)
+    for i in range(6):
+        tm.make_children_for_current()
+        tm.switch_to_child(0)
+    print(tm)

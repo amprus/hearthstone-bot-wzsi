@@ -19,6 +19,12 @@ class DrawCard(Action):
         active_player = self.board.get_active_player()
         active_player.draw_card(self.card_idx)
 
+    def __str__(self):
+        return 'DrawCard({})'.format(self.card_idx)
+
+    def __repr__(self):
+        return 'DrawCard({})'.format(self.card_idx)
+        
 
 class EndTurn(Action):
     def __init__(self, board, safe):
@@ -43,6 +49,12 @@ class EndTurn(Action):
                 if isinstance(side[card_idx], Minion):
                     if side[card_idx].is_dead():
                         side.pop(card_idx)
+
+    def __str__(self):
+        return 'EndTurn()'
+
+    def __repr__(self):
+        return 'EndTurn()'
 
 
 class Attack(Action):
@@ -79,6 +91,12 @@ class Attack(Action):
                 taunts.append(idx)
         return taunts
 
+    def __str__(self):
+        return 'Attack({}, {})'.format(self.atk_idx, self.def_idx)
+
+    def __repr__(self):
+        return 'Attack({}, {})'.format(self.atk_idx, self.def_idx)
+
 
 class PlayMinion(Action):
     def __init__(self, board, card_idx):
@@ -92,6 +110,12 @@ class PlayMinion(Action):
             card = self.board.get_active_player().play_card(self.card_idx)
             if card:
                 self.board.get_active_side().append(card)
+
+    def __str__(self):
+        return 'PlayMinion({})'.format(self.card_idx)
+
+    def __repr__(self):
+        return 'PlayMinion({})'.format(self.card_idx)
 
 
 class CastSpell(Action):
@@ -117,6 +141,12 @@ class CastSpell(Action):
             if not self.safe:
                 other_side.pop(self.target_idx)
 
+    def __str__(self):
+        return 'CastSpell({}, {})'.format(self.card_idx, self.target_idx)
+
+    def __repr__(self):
+        return 'CastSpell({}, {})'.format(self.card_idx, self.target_idx)
+        
 
 class ActionFactory:
     def __init__(self, board):
