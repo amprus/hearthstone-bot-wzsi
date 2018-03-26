@@ -22,19 +22,26 @@ class BoardTree:
         self.children = [BoardTree(board_state=state, last_actions=actions, parent=self, children=[]) for state, actions in states]
 
     def _generate_children(self, board, states, actions):
+        if self.is_leaf():
+            return
         for action in Analyzer(board).generate_actions():
             new_board_state = deepcopy(board)
-            new_action = deepcopy(action)
             new_actions = list(actions)
-            new_actions.append(new_action)
+            new_actions.append(action)
             # Set new board for action to execute
             # Otherwise it will execute in main board!!!
-            new_action.board = new_board_state
-            new_board_state.execute_action(new_action)
-            if isinstance(new_action, EndTurn):
+            action.board = new_board_state
+            new_board_state.execute_action(action)
+            if isinstance(action, EndTurn):
+                states.append((new_board_state, new_actions))
+                continue
+            if new_board_state.is_game_over():
                 states.append((new_board_state, new_actions))
                 continue
             self._generate_children(new_board_state, states, new_actions)
+
+    def is_leaf(self):
+        return self.board_state.is_game_over()
 
     def propagate_results(self, wins=0, loses=0):
         self.wins_count += wins
@@ -42,22 +49,24 @@ class BoardTree:
         if not self.parent is None:
             self.parent.propagate_results(wins, loses)
 
-    def _on_game_over(self, winning_player):
-        if winning_player == 1:
-            self.propagate_results(wins=1)
-        else:
-            self.propagate_results(loses=1)
-
     def __str__(self):
-        return '  ' * self.level + 'TreeNode(L:{}, A:{})'.format(self.level, self.last_actions)
+        return '  ' * self.level + 'TreeNode(L:{}, A:{}, W:{}/{})'.format(self.level, self.last_actions, self.wins_count, self.loses_count)
 
     def __repr__(self):
-        return '  ' * self.level + 'TreeNode(L:{}, A:{})'.format(self.level, self.last_actions)
+        return '  ' * self.level + 'TreeNode(L:{}, A:{}, W:{}/{})'.format(self.level, self.last_actions, self.wins_count, self.loses_count)
+
+
+def on_game_over(node):
+    def func(winning_player):
+        node.propagate_results(winning_player)
+    return func
 
 
 class TreeManager:
     def __init__(self, board):
-        self.root = BoardTree(board_state=deepcopy(board),
+        new_board = deepcopy(board)
+        new_board.exit_on_game_over = False
+        self.root = BoardTree(board_state=new_board,
                               parent=None,
                               last_actions=[],
                               children=[])
@@ -73,9 +82,22 @@ class TreeManager:
     def switch_to_child(self, idx):
         self.current = self.current.children[idx]
 
+    def go_to_root(self):
+        self.current = self.root
+
+    def is_current_leaf(self):
+        return self.current.is_leaf()
+
+    def propagate_results_from_current(self):
+        winner = self.current.board_state.winner
+        if winner == 1:
+            self.current.propagate_results(wins=1)
+        else:
+            self.current.propagate_results(loses=1)
+
     def a(self, node):
         delim = '\n' if node.children else ''
         return str(node) + delim + '\n'.join([self.a(child) for child in node.children])
 
     def __str__(self):
-        return self.a(self.root)
+        return self.a(self.root) + '\n# of children: {}'.format(len(self.current.children))

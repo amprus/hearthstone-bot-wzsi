@@ -7,14 +7,15 @@ import sys
 
 
 class Board:
-    def __init__(self, on_game_over=None):
+    def __init__(self, exit_on_game_over=False):
         self.actions = ActionFactory(self)
         self.deck1 = []
         self.deck2 = []
         self.players = []
         self.sides = [[], []]
         self.active_player = 0
-        self.on_game_over = on_game_over
+        self.exit_on_game_over = exit_on_game_over
+        self.winner = None
 
     def initialize_game(self):
         initializer = DeckInitializer()
@@ -86,11 +87,13 @@ class Board:
         pass
 
     def game_over(self, active):
-        print('Player #{} won!'.format(active+1))
-        if not self.on_game_over:
-            sys.exit(active)
-        else:
-            self.on_game_over(active+1)
+        self.winner = active+1        
+        if self.exit_on_game_over:
+            print('Player #{} won!'.format(active+1))
+            sys.exit(self.winner)
+
+    def is_game_over(self):
+        return self.winner is not None
 
     def __str__(self):
         board_str = ''

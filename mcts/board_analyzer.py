@@ -8,6 +8,8 @@ class Analyzer:
         self.reviewer = BoardReviewer(board)
 
     def generate_actions(self):
+        if self.board.is_game_over():
+            return []
         all_actions = []
         all_actions.extend(self.generate_playing_minions())
         all_actions.extend(self.generate_attacks())

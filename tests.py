@@ -6,7 +6,8 @@ from mcts.tree import TreeManager
 from copy import deepcopy
 
 
-b = Board()
+b = Board(exit_on_game_over=True)
+# b = Board()
 b.initialize_game()
 
 ag = AggressiveBot()
@@ -53,3 +54,6 @@ def tree_demo():
         tm.make_children_for_current()
         tm.switch_to_child(0)
     print(tm)
+
+for i in range(15):
+    b.end_turn()
