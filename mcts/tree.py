@@ -31,23 +31,28 @@ class BoardTree:
     def _generate_children(self, board, states, actions):
         if self.is_leaf():
             return
-        if len(states) >= self.max_children:
-            return
-        for action in Analyzer(board).generate_actions():
-            new_board_state = deepcopy(board)
-            new_actions = list(actions)
-            new_actions.append(action)
-            # Set new board for action to execute
-            # Otherwise it will execute in main board!!!
-            action.board = new_board_state
-            new_board_state.execute_action(action)
-            if isinstance(action, EndTurn):
-                states.append((new_board_state, new_actions))
-                continue
-            if new_board_state.is_game_over():
-                states.append((new_board_state, new_actions))
-                continue
-            self._generate_children(new_board_state, states, new_actions)
+        stack = []
+        stack.append((board, actions))
+        while stack:
+            s_board, s_actions = stack.pop()
+            if len(states) >= self.max_children:
+                return
+            for action in Analyzer(s_board).generate_actions():
+                new_board_state = deepcopy(s_board)
+                new_actions = list(s_actions)
+                new_actions.append(action)
+                # Set new board for action to execute
+                # Otherwise it will execute in main board!!!
+                action.board = new_board_state
+                new_board_state.execute_action(action)
+                if isinstance(action, EndTurn):
+                    states.append((new_board_state, new_actions))
+                    continue
+                if new_board_state.is_game_over():
+                    states.append((new_board_state, new_actions))
+                    continue
+                # self._generate_children(new_board_state, states, new_actions)
+                stack.append((new_board_state, new_actions))
 
     def get_score(self):
         total_count = self.wins_count + self.losses_count

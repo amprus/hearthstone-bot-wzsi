@@ -39,3 +39,11 @@ def pa():
     actions = analyzer.generate_actions()
     for action in actions:
         print(action)
+
+
+print('Monte Carlo: Player #{}'.format(b.get_active_idx()+1))
+print('Passive Naive: Player #{}'.format(b.get_other_idx()+1))
+
+while True:
+    mt_make_move()
+    pass_make_move()
