@@ -13,21 +13,25 @@ class MonteCarloPlayer:
         player = board.get_active_idx() + 1
         tm = TreeManager(board, max_children, player)
         time_start = time()
-        while time() < time_start + seconds_for_move:
-            self.tree_policy(tm)
-            self.default_policy(tm)
-            self.backup(tm)
-        tm.go_to_root()
-        if print_res:
-            print(tm)
-        best_idx = tm.get_best_child_index_for_current()
-        tm.switch_to_child(best_idx)
-        actions = tm.get_actions_for_current()
-        if print_res:
-            print(actions)
-        for action in actions:
-            action.board = board
-            board.execute_action(action)
+        # while time() < time_start + seconds_for_move:
+        try:
+            with timeout(seconds_for_move, exception=RuntimeError):
+                while True:
+                    self.tree_policy(tm)
+                    self.default_policy(tm)
+                    self.backup(tm)
+        except RuntimeError:
+            tm.go_to_root()
+            if print_res:
+                print(tm)
+            best_idx = tm.get_best_child_index_for_current()
+            tm.switch_to_child(best_idx)
+            actions = tm.get_actions_for_current()
+            if print_res:
+                print(actions)
+            for action in actions:
+                action.board = board
+                board.execute_action(action)
 
     def tree_policy(self, tm):
         while not tm.is_current_leaf():

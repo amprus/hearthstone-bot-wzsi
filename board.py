@@ -89,6 +89,7 @@ class Board:
     def game_over(self, active):
         self.winner = active+1        
         if self.exit_on_game_over:
+            print(str(self))
             print('Player #{} won!'.format(active+1))
             sys.exit(self.winner)
 

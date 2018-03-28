@@ -23,11 +23,13 @@ class Analyzer:
 
     def generate_playing_minions(self):
         player = self.board.get_active_player()
+        active_side = self.board.get_active_side()
         actions = []
         for idx, card in enumerate(player.hand.cards):
             if card.cost <= player.mana:
                 if card.type == 'minion':
-                    actions.append(self.actions.play_minion(idx))
+                    if len(active_side) < 7:
+                        actions.append(self.actions.play_minion(idx))
         return actions
 
     def generate_ending_turn(self):
@@ -43,9 +45,10 @@ class Analyzer:
             if minion.can_attack:
                 taunts = [c for c in other_side if c.taunt]
                 for enemyidx, enemy in enumerate(other_side):
-                    if taunts and enemy.taunt:
-                        actions.append(self.actions.attack(idx, enemyidx))
-                    elif not taunts:
+                    if taunts:
+                        if enemy.taunt:
+                            actions.append(self.actions.attack(idx, enemyidx))
+                    else:
                         actions.append(self.actions.attack(idx, enemyidx))
         return actions
 

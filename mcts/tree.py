@@ -32,9 +32,13 @@ class BoardTree:
         if self.is_leaf():
             return
         stack = []
+        iters = 0
         stack.append((board, actions))
         while stack:
+            iters += 1
             s_board, s_actions = stack.pop()
+            if iters > 1000:
+                print(s_actions)
             if len(states) >= self.max_children:
                 return
             for action in Analyzer(s_board).generate_actions():
