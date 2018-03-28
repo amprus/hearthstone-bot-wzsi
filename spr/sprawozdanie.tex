@@ -1,0 +1,75 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{a4wide}
+\usepackage[OT4]{fontenc}
+\usepackage[english,polish]{babel}
+\usepackage{indentfirst}
+\usepackage{graphicx} 
+\usepackage{float}
+\usepackage{listings}
+\usepackage[hidelinks, pdftoolbar = false, pdfmenubar = false, bookmarks = false]{hyperref}
+\usepackage{geometry}
+    
+\renewcommand{\baselinestretch}{1.0}
+\newgeometry{tmargin=2.5cm, bmargin=2.5cm, lmargin=2.5cm, rmargin=2.5cm} 
+    
+\begin{document}
+
+\thispagestyle{empty}
+\noindent Aleksander Prus, 218404 \hfill Wrocław, d.\ \today
+\\ Rafał Szyszka, 218207
+
+\vfill
+
+\begin{center}
+    \begin{Huge}
+        Monte Carlo Tree Search\\
+    \end{Huge}
+\end{center}
+
+\begin{center}
+    Rok akad. 2017/2018, DAN
+\end{center}
+
+\vspace{0.2ex}
+
+\begin{flushright}
+    \begin{minipage}[t]{0.4\columnwidth}
+        \noindent Mgr inż. Jan Jakubik
+    \end{minipage}
+\end{flushright}
+
+\vfill
+\newpage
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{Cel ćwiczenia}
+Celem ćwiczenia była iplementacja uproszczonej wersji popularnej gry Hearthstone, z graczem komputerowym, którego zachowanie zdefiniowane będzie algorytmem Monte Carlo Tree Search. Dodatkowo należało zaimplementować trzech graczy naiwnych:
+\begin{itemize}
+\item losowy,
+\item agresywny,
+\item kontrolujący.
+\end{itemize}
+
+Gracz agresywny w pierwszej kolejności skupia się na zadaniu jak największej ilości obrażeń bohaterowi gracza. Natomiast gracz kontrolujący skupia się na wyeliminowaniu minionów przeciwnika.
+
+
+\section*{Realizacja}
+Do realizacji zadania wybrano język Python, ze względu na mnogość zewnętrznych bibliotek oraz wysoki poziom abstrakcji języka.
+
+\subsection*{Naiwni gracze}
+Logika naiwnych graczy została zimplementowana w pakiecie \textbf{naive-bots}. Ich zachowanie określają dwie metody \textbf{card-rating} oraz \textbf{choose-targets}. Pierwsza z nich odpowiada za dobór kart do zagrania z ręki, w turze wybrangeo bota. Natomiast druga metoda, odpowiada za wybór celów do zaatakowania po stronie przeciwnika.
+
+\subsubsection*{Bot losowy}
+Ten gracz w sposób losowy wybiera karty do zagrania oraz cele, które zaatakuje w danej turze.
+
+\subsubsection*{Bot agresywny}
+Ten gracz preferuje karty z dużą ilością ataku. Za swoje cele, w pierwszej kolejności, bierze karty przeciwnika z właściwością \textbf{[TAUNT]}, następnie wybiera karty z wysoką wartością życia (większy od 4), jeżeli takich kart przeciwnik nie posiada na stole, bot agresywny atakuje jego bohatera.
+
+\subsubsection*{Bot kontrolujący}
+Ten gracz preferuje karty defensywne, z dużą ilością życia. Za swoje cele, w pierwszej kolejności, bierze karty przeciwnika z właściwością \textbf{[TAUNT]}, następnie wybiera karty z wysoką wartością życia (większy od 4), następnie wybiera pozostałe karty przeciwnika na stole. Bohater przeciwnika jest ostatnim wybieranym celem gracza kontrolującego.
+
+\end{document}
